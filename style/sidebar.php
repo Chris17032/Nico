@@ -93,6 +93,11 @@ function sidebarActive(string $file, string $currentPage): string
                 <span>Log</span>
             </a>
 
+            <a href="test_mail" class="<?= sidebarActive('test_mail.php', $currentPage) ?>">
+                <i class="bi bi-envelope-check"></i>
+                <span>E-Mail Test</span>
+            </a>
+
             <a href="admin_support" class="<?= sidebarActive('admin_support.php', $currentPage) ?>">
                 <i class="bi bi-headset"></i>
                 <span>Support Tickets</span>

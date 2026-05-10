@@ -16,8 +16,8 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
         return false;
     }
 
-    $fromEmail = 'support@nnewton.de';
-    $fromName  = 'Einkauf Support';
+    $fromEmail = defined('MAIL_FROM')      ? MAIL_FROM      : 'support@nnewton.de';
+    $fromName  = defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'Einkauf Support';
 
     $boundary = '=_Part_' . md5(uniqid((string)mt_rand(), true));
 

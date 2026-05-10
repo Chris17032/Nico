@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/helpers/mailer.php';
 
 $currentUser = requireLogin($pdo);
 $userId      = (int)$currentUser['id'];
@@ -68,6 +69,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
                     'target_type' => 'support_ticket',
                     'target_id' => $ticketId,
                 ]);
+            }
+
+            // Send email to configured admin addresses
+            $typeLabels = ['bug' => 'Bug / Fehler', 'feedback' => 'Feedback', 'sonstiges' => 'Sonstiges'];
+            $typeLabel  = $typeLabels[$type] ?? $type;
+            $adminEmails = defined('SUPPORT_ADMIN_EMAILS') ? SUPPORT_ADMIN_EMAILS : [];
+
+            foreach ($adminEmails as $adminEmail) {
+                if (trim($adminEmail) === '') continue;
+                $htmlEmail = '
+                    <p><strong>Neues Support-Ticket #' . $ticketId . '</strong></p>
+                    <table style="border-collapse:collapse;font-size:14px;">
+                        <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Von:</td><td><strong>' . htmlspecialchars($currentUser['family_name'], ENT_QUOTES, 'UTF-8') . '</strong></td></tr>
+                        <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Typ:</td><td>' . htmlspecialchars($typeLabel, ENT_QUOTES, 'UTF-8') . '</td></tr>
+                        <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Betreff:</td><td>' . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '</td></tr>
+                    </table>
+                    <p style="margin-top:16px;background:#f4f6f9;padding:12px;border-left:3px solid #2563eb;">' . nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')) . '</p>
+                    <p><a href="https://einkauf.nnewton.de/admin_support.php?id=' . $ticketId . '">Ticket im System öffnen →</a></p>
+                ';
+                sendMail(trim($adminEmail), 'Admin', 'Neues Support-Ticket: ' . $subject, $htmlEmail);
             }
 
             supportJsonResponse(true, 'Dein Ticket wurde erfolgreich gesendet. Wir melden uns bald!');

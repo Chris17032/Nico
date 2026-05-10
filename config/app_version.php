@@ -1,7 +1,29 @@
 <?php
 
 if (!defined('APP_VERSION')) {
-    define('APP_VERSION', '0.9.0');
+    define('APP_VERSION', '0.9.1');
+}
+
+/*
+ * E-Mail-Adressen die bei einem neuen Support-Ticket benachrichtigt werden.
+ * Hier beliebig viele Adressen eintragen.
+ */
+if (!defined('SUPPORT_ADMIN_EMAILS')) {
+    define('SUPPORT_ADMIN_EMAILS', [
+        'support@nnewton.de',
+        // 'weitere@email.de',
+    ]);
+}
+
+/*
+ * Absende-Adresse für alle System-E-Mails.
+ */
+if (!defined('MAIL_FROM')) {
+    define('MAIL_FROM', 'support@nnewton.de');
+}
+
+if (!defined('MAIL_FROM_NAME')) {
+    define('MAIL_FROM_NAME', 'Einkauf Support');
 }
 
 if (!defined('APP_VERSION_NAME')) {
@@ -9,15 +31,29 @@ if (!defined('APP_VERSION_NAME')) {
 }
 
 if (!defined('APP_BUILD_DATE')) {
-    define('APP_BUILD_DATE', '2026-05-01');
+    define('APP_BUILD_DATE', '2026-05-10');
 }
 
 $APP_CHANGELOG = [
     [
+        'version' => '0.9.1',
+        'name' => 'Support Update',
+        'date' => '2026-05-10',
+        'type' => 'Aktuell',
+        'changes' => [
+            'Support-Ticket-System eingebaut – Feedback und Fehlermeldungen direkt im Portal senden.',
+            'E-Mail-Benachrichtigung an Admins bei neuen Support-Tickets.',
+            'E-Mail-Versand bei Rechnungserstellung und -aktualisierung (PDF im Anhang).',
+            'E-Mail-Adressen pro Benutzer in der Benutzerverwaltung hinterlegbar.',
+            'E-Mail-Testseite für Admins eingebaut.',
+            'Changelog-Link in Sidebar für alle Benutzer ergänzt.',
+        ],
+    ],
+    [
         'version' => '0.9.0',
         'name' => 'Beta',
         'date' => '2026-05-01',
-        'type' => 'Aktuell',
+        'type' => 'Feature',
         'changes' => [
             'Dashboard überarbeitet und Benutzername aus der Datenbank geladen.',
             'EAT-Zeitzone für Madagascar / East Africa Time eingebaut.',
