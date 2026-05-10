@@ -109,7 +109,7 @@ $currentRank = 1;
 
 if (isset($_SESSION['user_id'])) {
     $stmt = $pdo->prepare(" 
-        SELECT id, family_name, avatar, role, `rank`, is_locked
+        SELECT id, family_name, email, avatar, role, `rank`, is_locked
         FROM users
         WHERE id = ?
         LIMIT 1

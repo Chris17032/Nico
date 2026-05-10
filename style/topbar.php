@@ -302,7 +302,14 @@ if (isset($_SESSION['user_id'])) {
                     PIN-Zurücksetzen
                 </button>
 
-                <?php if ($isAdmin): ?>
+                        <div class="dropdown-divider"></div>
+
+                <button type="button" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#supportTicketModal">
+                    <i class="bi bi-headset me-2"></i>
+                    Support / Feedback
+                </button>
+
+        <?php if ($isAdmin): ?>
                     <div class="dropdown-divider"></div>
 
                     <button type="button" class="dropdown-item text-danger" data-bs-toggle="modal" data-bs-target="#adminMessageModal">
@@ -634,4 +641,83 @@ if (isset($_SESSION['user_id'])) {
             }
         });
     <?php endif; ?>
+
+    /* Support Ticket Modal */
+    document.getElementById('supportTicketForm')?.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const btn = this.querySelector('[type="submit"]');
+        const fd  = new FormData(this);
+        fd.append('ajax_action', 'submit_ticket');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Senden…';
+
+        fetch('support.php', { method: 'POST', body: fd })
+            .then(r => r.json())
+            .then(res => {
+                window.showAppToast(res.message, res.success);
+                if (res.success) {
+                    document.getElementById('supportTicketForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('supportTicketModal'))?.hide();
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-send me-1"></i>Absenden';
+                }
+            })
+            .catch(() => {
+                window.showAppToast('Fehler beim Senden.', false);
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-send me-1"></i>Absenden';
+            });
+    });
 </script>
+
+<!-- Support Ticket Modal -->
+<div class="modal fade" id="supportTicketModal" tabindex="-1" aria-labelledby="supportTicketModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="supportTicketModalLabel">
+                    <i class="bi bi-headset me-2"></i>Support / Feedback
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+            </div>
+
+            <form id="supportTicketForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Typ</label>
+                        <select name="type" class="form-select">
+                            <option value="feedback">Feedback</option>
+                            <option value="bug">Bug / Fehler melden</option>
+                            <option value="sonstiges">Sonstiges</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Betreff</label>
+                        <input type="text" name="subject" class="form-control" maxlength="255"
+                               placeholder="Kurze Beschreibung…" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nachricht</label>
+                        <textarea name="message" class="form-control" rows="5" maxlength="5000"
+                                  placeholder="Was ist passiert? Was hast du erwartet? …" required></textarea>
+                    </div>
+
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        Dein Ticket wird an die Admins weitergeleitet und so schnell wie möglich bearbeitet.
+                    </p>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-send me-1"></i>Absenden
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

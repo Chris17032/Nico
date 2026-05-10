@@ -193,6 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         $discount = max(0, min(100, (int)($_POST['discount_percent'] ?? 0)));
         $serviceFeeWaived = (int)($_POST['service_fee_waived'] ?? 0);
         $shoppingFeeWaived = (int)($_POST['shopping_fee_waived'] ?? 0);
+        $email = trim($_POST['email'] ?? '');
 
         if ($userId <= 0) {
             employeesPageJsonResponse(false, 'Ungültiger Benutzer.');
@@ -203,7 +204,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         }
 
         $stmt = $pdo->prepare("
-            SELECT family_name, `rank`, discount_percent, service_fee_waived, shopping_fee_waived
+            SELECT family_name, email, `rank`, discount_percent, service_fee_waived, shopping_fee_waived
             FROM users
             WHERE id = ?
         ");
@@ -227,9 +228,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
 
         $changes = [];
         $oldFamilyName = (string)$existingUser['family_name'];
+        $oldEmail = (string)($existingUser['email'] ?? '');
 
         if ($oldFamilyName !== $familyName) {
             $changes[] = 'Name: "' . $oldFamilyName . '" → "' . $familyName . '"';
+        }
+
+        if ($oldEmail !== $email) {
+            $changes[] = 'E-Mail: "' . $oldEmail . '" → "' . $email . '"';
         }
 
         if ((int)$existingUser['rank'] !== $rank) {
@@ -252,6 +258,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
             employeesPageJsonResponse(true, 'Keine Änderungen erkannt.', [
                 'user_id' => $userId,
                 'family_name' => $familyName,
+                'email' => $email,
                 'initials' => employeesPageFamilyInitials($familyName),
                 'rank' => $rank,
                 'role_name' => employeesPageRoleName($rank),
@@ -263,10 +270,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
 
         $stmt = $pdo->prepare("
             UPDATE users
-            SET family_name = ?, `rank` = ?, discount_percent = ?, service_fee_waived = ?, shopping_fee_waived = ?
+            SET family_name = ?, email = ?, `rank` = ?, discount_percent = ?, service_fee_waived = ?, shopping_fee_waived = ?
             WHERE id = ?
         ");
-        $stmt->execute([$familyName, $rank, $discount, $serviceFeeWaived, $shoppingFeeWaived, $userId]);
+        $stmt->execute([$familyName, $email ?: null, $rank, $discount, $serviceFeeWaived, $shoppingFeeWaived, $userId]);
 
         employeesPageWriteActivityLog(
             $pdo,
@@ -294,6 +301,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         employeesPageJsonResponse(true, 'Benutzer wurde gespeichert.', [
             'user_id' => $userId,
             'family_name' => $familyName,
+            'email' => $email,
             'initials' => employeesPageFamilyInitials($familyName),
             'rank' => $rank,
             'role_name' => employeesPageRoleName($rank),
@@ -469,7 +477,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
 $pageTitle = 'Account Management';
 
 $families = $pdo->query("
-    SELECT id, family_name, role, `rank`, avatar, discount_percent, service_fee_waived, shopping_fee_waived, is_locked, created_at
+    SELECT id, family_name, email, role, `rank`, avatar, discount_percent, service_fee_waived, shopping_fee_waived, is_locked, created_at
     FROM users
     ORDER BY `rank` DESC, family_name ASC
 ")->fetchAll();
@@ -566,6 +574,7 @@ ob_start();
                     <tr>
                         <th>Benutzer</th>
                         <th>Rolle</th>
+                        <th>E-Mail</th>
                         <th>Rabatt</th>
                         <th>Servicegebühr</th>
                         <th>Einkaufsgebühr</th>
@@ -580,7 +589,7 @@ ob_start();
                         <?php if ($currentGroupRank !== (int)$family['rank']): ?>
                             <?php $currentGroupRank = (int)$family['rank']; ?>
                             <tr class="family-group-row">
-                                <td colspan="7">
+                                <td colspan="8">
                                     <span class="family-group-title"><?= htmlspecialchars(employeesPageRoleName($currentGroupRank)) ?></span>
                                     <span class="family-group-count">
                                         <?= (int)($familyGroupCounts[$currentGroupRank] ?? 0) ?>
@@ -592,6 +601,7 @@ ob_start();
                         <tr
                             data-id="<?= (int)$family['id'] ?>"
                             data-family-name="<?= htmlspecialchars($family['family_name'], ENT_QUOTES, 'UTF-8') ?>"
+                            data-email="<?= htmlspecialchars($family['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
                             data-rank="<?= (int)$family['rank'] ?>"
                             data-discount="<?= (int)$family['discount_percent'] ?>"
                             data-service="<?= (int)$family['service_fee_waived'] ?>"
@@ -628,6 +638,16 @@ ob_start();
                                         </span>
                                     </div>
                                 </div>
+                            </td>
+
+                            <td style="width: 200px;">
+                                <input
+                                    type="email"
+                                    class="form-control form-control-sm family-email editable-family-field"
+                                    value="<?= htmlspecialchars($family['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>"
+                                    placeholder="E-Mail (optional)"
+                                    autocomplete="off"
+                                >
                             </td>
 
                             <td style="width: 190px;">
@@ -876,6 +896,7 @@ function collectRowData(row) {
         ajax_action: 'update_family',
         user_id: row.dataset.id,
         family_name: row.querySelector('.family-name-input').value,
+        email: row.querySelector('.family-email')?.value || '',
         rank: row.querySelector('.family-rank').value,
         discount_percent: row.querySelector('.family-discount').value,
         service_fee_waived: row.querySelector('.family-service').checked ? 1 : 0,
@@ -887,6 +908,7 @@ function rowHasChanges(row) {
     const data = collectRowData(row);
 
     return String(data.family_name) !== String(row.dataset.familyName || '')
+        || String(data.email) !== String(row.dataset.email || '')
         || String(data.rank) !== String(row.dataset.rank || '')
         || String(data.discount_percent) !== String(row.dataset.discount || '')
         || String(data.service_fee_waived) !== String(row.dataset.service || '')
@@ -920,6 +942,7 @@ function clearRowChanged(row) {
 
 function resetFamilyRow(row) {
     row.querySelector('.family-name-input').value = row.dataset.familyName || '';
+    if (row.querySelector('.family-email')) row.querySelector('.family-email').value = row.dataset.email || '';
     row.querySelector('.family-rank').value = row.dataset.rank || '';
     row.querySelector('.family-discount').value = row.dataset.discount || '0';
     row.querySelector('.family-service').checked = String(row.dataset.service || '0') === '1';
@@ -948,6 +971,7 @@ function saveFamilyRow(row) {
             }
 
             row.dataset.familyName = result.data.family_name;
+            row.dataset.email = result.data.email || '';
             row.dataset.rank = result.data.rank;
             row.dataset.discount = result.data.discount_percent;
             row.dataset.service = result.data.service_fee_waived;

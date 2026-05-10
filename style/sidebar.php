@@ -80,7 +80,7 @@ function sidebarActive(string $file, string $currentPage): string
 
             <a href="what_can_it_do" class="<?= sidebarActive('what_can_it_do.php', $currentPage) ?>">
                 <i class="bi bi-stars"></i>
-                <span>Feature</span>
+                <span>Funktionen</span>
             </a>
 
             <a href="statistics" class="<?= sidebarActive('statistics.php', $currentPage) ?>">
@@ -92,9 +92,27 @@ function sidebarActive(string $file, string $currentPage): string
                 <i class="bi bi-journal-text"></i>
                 <span>Log</span>
             </a>
+
+            <a href="admin_support" class="<?= sidebarActive('admin_support.php', $currentPage) ?>">
+                <i class="bi bi-headset"></i>
+                <span>Support Tickets</span>
+                <?php
+                try {
+                    $sidebarTicketStmt = $pdo->query("SELECT COUNT(*) FROM support_tickets WHERE status = 'offen'");
+                    $sidebarOpenTickets = (int)$sidebarTicketStmt->fetchColumn();
+                    if ($sidebarOpenTickets > 0):
+                ?>
+                    <span class="badge bg-danger ms-auto"><?= $sidebarOpenTickets ?></span>
+                <?php endif; } catch (Throwable $e) {} ?>
+            </a>
         <?php endif; ?>
 
         <hr class="sidebar-divider">
+
+        <a href="changelog" class="<?= sidebarActive('changelog.php', $currentPage) ?>">
+            <i class="bi bi-clock-history"></i>
+            <span>Changelog</span>
+        </a>
 
         <a href="logout.php">
             <i class="bi bi-box-arrow-right"></i>

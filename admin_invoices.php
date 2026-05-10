@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/config/config.php';
+require_once __DIR__ . '/helpers/mailer.php';
+require_once __DIR__ . '/helpers/invoice_pdf_helper.php';
 
 $currentRank = (int)$currentUser['rank'];
 
@@ -364,6 +366,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
             ]);
 
             $pdo->commit();
+
+            // Send email if user has email address and relevant fields changed
+            if ($notificationMessages) {
+                try {
+                    $emailStmt = $pdo->prepare("SELECT email, family_name FROM users WHERE id = ? LIMIT 1");
+                    $emailStmt->execute([(int)$oldInvoice['user_id']]);
+                    $emailUser = $emailStmt->fetch();
+                    $userEmail = trim((string)($emailUser['email'] ?? ''));
+
+                    if ($userEmail !== '') {
+                        $pdfBytes  = generateInvoicePdf($pdo, (string)$oldInvoice['public_token']);
+                        $userName  = $emailUser['family_name'] ?? 'Familie';
+                        $changes   = implode('<br>', array_map('htmlspecialchars', $notificationMessages));
+                        $htmlEmail = '
+                            <p>Hallo ' . htmlspecialchars($userName, ENT_QUOTES, 'UTF-8') . ',</p>
+                            <p>deine Rechnung <strong>' . htmlspecialchars($invoiceNumber, ENT_QUOTES, 'UTF-8') . '</strong> wurde aktualisiert:</p>
+                            <p>' . $changes . '</p>
+                            <p>Im Anhang findest du die aktuelle Rechnung als PDF.</p>
+                            <p>Mit freundlichen Grüßen<br>Das Einkauf-Team</p>
+                        ';
+
+                        sendMail($userEmail, $userName, 'Rechnung aktualisiert: ' . $invoiceNumber, $htmlEmail, $pdfBytes !== null ? [
+                            'filename' => 'Rechnung_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $invoiceNumber) . '.pdf',
+                            'data'     => $pdfBytes,
+                            'mime'     => 'application/pdf',
+                        ] : null);
+                    }
+                } catch (Throwable $mailEx) {
+                    // Mail failure must not abort the invoice update
+                }
+            }
 
             jsonResponse(true, 'Rechnung wurde aktualisiert.');
         } catch (Throwable $e) {
