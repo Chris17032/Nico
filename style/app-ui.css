@@ -1,0 +1,470 @@
+/* =========================================================
+   REPARATUR + EINHEITLICHER BASISLOOK
+   Diese Datei überschreibt gezielt altes style.css.
+========================================================= */
+
+:root {
+    --app-sidebar-width: 260px;
+    --app-sidebar-collapsed-width: 78px;
+    --app-topbar-height: 58px;
+    --app-footer-height: 44px;
+
+    --app-bg: #f5f7fb;
+    --app-surface: #ffffff;
+    --app-surface-soft: #f8fafc;
+    --app-border: #e2e8f0;
+    --app-border-strong: #cbd5e1;
+
+    --app-text: #0f172a;
+    --app-muted: #64748b;
+
+    --app-primary: #2563eb;
+    --app-primary-dark: #1d4ed8;
+
+    --app-sidebar-bg: #26313b;
+    --app-sidebar-border: rgba(255, 255, 255, .08);
+    --app-sidebar-text: #d6dde6;
+    --app-sidebar-muted: #94a3b8;
+
+    --app-radius: 14px;
+    --app-shadow-sm: 0 8px 22px rgba(15, 23, 42, .055);
+}
+
+/* =========================================================
+   WICHTIG: GRUNDLAYOUT REPARIEREN
+========================================================= */
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    margin: 0 !important;
+    background: var(--app-bg) !important;
+    color: var(--app-text);
+    overflow-x: hidden;
+}
+
+.content-wrapper {
+    margin-left: var(--app-sidebar-width) !important;
+    min-height: 100vh !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: var(--app-bg) !important;
+    transition: margin-left .2s ease;
+}
+
+body.sidebar-collapsed .content-wrapper {
+    margin-left: var(--app-sidebar-collapsed-width) !important;
+}
+
+.content {
+    flex: 1 0 auto !important;
+    padding: 1.35rem 1.45rem !important;
+    background: var(--app-bg) !important;
+}
+
+.container-fluid {
+    max-width: 1440px;
+}
+
+/* =========================================================
+   SIDEBAR REPARIEREN
+========================================================= */
+
+.sidebar {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    bottom: 0 !important;
+    width: var(--app-sidebar-width) !important;
+    height: 100vh !important;
+    background: var(--app-sidebar-bg) !important;
+    color: var(--app-sidebar-text) !important;
+    z-index: 1040 !important;
+    border-right: 1px solid var(--app-sidebar-border);
+    overflow-y: auto;
+    transition: width .2s ease, transform .2s ease;
+}
+
+body.sidebar-collapsed .sidebar {
+    width: var(--app-sidebar-collapsed-width) !important;
+}
+
+.sidebar .brand,
+.brand {
+    height: var(--app-topbar-height) !important;
+    min-height: var(--app-topbar-height) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: .65rem !important;
+    padding: 0 1rem !important;
+    color: #fff !important;
+    font-size: 1.15rem !important;
+    font-weight: 800 !important;
+    border-bottom: 1px solid var(--app-sidebar-border) !important;
+}
+
+.brand-logo {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.sidebar-user-box {
+    display: flex !important;
+    align-items: center !important;
+    gap: .75rem !important;
+    padding: 1rem !important;
+    border-bottom: 1px solid var(--app-sidebar-border) !important;
+}
+
+.sidebar-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 999px !important;
+    object-fit: cover !important;
+}
+
+.sidebar-user-text small {
+    color: var(--app-sidebar-muted) !important;
+    font-size: .78rem !important;
+}
+
+.sidebar-user-text strong {
+    display: block;
+    color: #fff !important;
+    font-size: .92rem !important;
+}
+
+.sidebar nav,
+.sidebar-nav {
+    padding: .65rem .6rem 1rem !important;
+}
+
+.sidebar nav a,
+.sidebar-nav a {
+    display: flex !important;
+    align-items: center !important;
+    gap: .75rem !important;
+    color: var(--app-sidebar-text) !important;
+    padding: .72rem .85rem !important;
+    border-radius: 10px !important;
+    margin-bottom: .2rem !important;
+    font-weight: 500 !important;
+    background: transparent !important;
+}
+
+.sidebar nav a i,
+.sidebar-nav a i {
+    width: 20px !important;
+    text-align: center !important;
+    color: #b6c2cf !important;
+}
+
+.sidebar nav a:hover,
+.sidebar-nav a:hover {
+    background: rgba(255, 255, 255, .07) !important;
+    color: #fff !important;
+}
+
+.sidebar nav a.active,
+.sidebar-nav a.active {
+    background: var(--app-primary) !important;
+    color: #fff !important;
+}
+
+.sidebar nav a.active i,
+.sidebar-nav a.active i {
+    color: #fff !important;
+}
+
+.sidebar-section-title {
+    padding: 1rem .85rem .35rem !important;
+    color: var(--app-sidebar-muted) !important;
+    font-size: .72rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .12em !important;
+    font-weight: 800 !important;
+}
+
+.sidebar-divider {
+    margin: .9rem .5rem !important;
+    border-color: var(--app-sidebar-border) !important;
+}
+
+body.sidebar-collapsed .brand span,
+body.sidebar-collapsed .sidebar-user-text,
+body.sidebar-collapsed .sidebar-section-title span,
+body.sidebar-collapsed .sidebar nav a span,
+body.sidebar-collapsed .sidebar-nav a span {
+    display: none !important;
+}
+
+body.sidebar-collapsed .brand,
+body.sidebar-collapsed .sidebar-user-box,
+body.sidebar-collapsed .sidebar nav a,
+body.sidebar-collapsed .sidebar-nav a {
+    justify-content: center !important;
+}
+
+/* =========================================================
+   TOPBAR REPARIEREN
+========================================================= */
+
+.topbar {
+    height: var(--app-topbar-height) !important;
+    min-height: var(--app-topbar-height) !important;
+    max-height: var(--app-topbar-height) !important;
+    width: 100% !important;
+    background: var(--app-surface) !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 1.15rem !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1030 !important;
+    box-shadow: none !important;
+}
+
+.topbar-left,
+.topbar-right,
+.topbar-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: .65rem !important;
+}
+
+.topbar-page-title {
+    font-size: .98rem !important;
+    font-weight: 750 !important;
+    color: var(--app-text) !important;
+}
+
+.topbar-btn,
+.topbar-icon-btn {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    border: 0 !important;
+    border-radius: 10px !important;
+    background: transparent !important;
+    color: var(--app-muted) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    padding: 0 !important;
+}
+
+.topbar-btn:hover,
+.topbar-icon-btn:hover {
+    background: var(--app-surface-soft) !important;
+    color: var(--app-text) !important;
+}
+
+.topbar-settings {
+    background: var(--app-surface-soft) !important;
+    color: var(--app-text) !important;
+}
+
+.topbar-notification span {
+    position: absolute !important;
+    top: -3px !important;
+    right: -2px !important;
+    min-width: 18px !important;
+    height: 18px !important;
+    border-radius: 999px !important;
+    background: var(--app-primary) !important;
+    color: #fff !important;
+    font-size: .68rem !important;
+    font-weight: 800 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* =========================================================
+   FOOTER REPARIEREN
+========================================================= */
+
+.app-footer,
+footer {
+    flex-shrink: 0 !important;
+    min-height: var(--app-footer-height) !important;
+    background: var(--app-surface) !important;
+    border-top: 1px solid var(--app-border) !important;
+    color: var(--app-muted) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: .7rem 1.45rem !important;
+    font-size: .82rem !important;
+    position: static !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    width: auto !important;
+}
+
+.footer-heart {
+    color: #ef4444;
+    font-weight: 900;
+}
+
+/* =========================================================
+   CARDS / TABLES EINHEITLICH
+========================================================= */
+
+.card {
+    border-radius: var(--app-radius) !important;
+    border: 1px solid var(--app-border) !important;
+    box-shadow: var(--app-shadow-sm) !important;
+    background: var(--app-surface) !important;
+}
+
+.card.border-0 {
+    border: 1px solid var(--app-border) !important;
+}
+
+.card-header {
+    background: var(--app-surface) !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    padding: .95rem 1.1rem !important;
+}
+
+.card-header h5 {
+    font-size: 1rem;
+    font-weight: 750;
+}
+
+.table thead th {
+    background: var(--app-surface-soft) !important;
+    color: #475569 !important;
+    border-bottom: 1px solid var(--app-border) !important;
+    font-size: .76rem !important;
+    text-transform: uppercase !important;
+    letter-spacing: .045em !important;
+    font-weight: 750 !important;
+    padding: .78rem .9rem !important;
+    white-space: nowrap !important;
+}
+
+.table tbody td {
+    padding: .78rem .9rem !important;
+    border-bottom: 1px solid #edf1f6 !important;
+    vertical-align: middle !important;
+}
+
+/* =========================================================
+   FORMS / BUTTONS
+========================================================= */
+
+.form-control,
+.form-select {
+    border-radius: 10px !important;
+    border: 1px solid var(--app-border-strong) !important;
+}
+
+.btn {
+    border-radius: 10px !important;
+    font-weight: 650 !important;
+}
+
+.btn-primary {
+    background: var(--app-primary) !important;
+    border-color: var(--app-primary) !important;
+}
+
+.btn-primary:hover {
+    background: var(--app-primary-dark) !important;
+    border-color: var(--app-primary-dark) !important;
+}
+
+/* =========================================================
+   DARK MODE
+========================================================= */
+
+body.dark-mode {
+    --app-bg: #11161b;
+    --app-surface: #1c232b;
+    --app-surface-soft: #252d36;
+    --app-border: #303a45;
+    --app-border-strong: #46515e;
+    --app-text: #f8fafc;
+    --app-muted: #a7b0bc;
+}
+
+body.dark-mode,
+body.dark-mode .content,
+body.dark-mode .content-wrapper {
+    background: var(--app-bg) !important;
+    color: var(--app-text) !important;
+}
+
+body.dark-mode .topbar,
+body.dark-mode .card,
+body.dark-mode .card-header,
+body.dark-mode .app-footer,
+body.dark-mode footer {
+    background: var(--app-surface) !important;
+    border-color: var(--app-border) !important;
+    color: var(--app-text) !important;
+}
+
+body.dark-mode .topbar-page-title {
+    color: var(--app-text) !important;
+}
+
+body.dark-mode .table thead th {
+    background: var(--app-surface-soft) !important;
+    color: #dbe3ec !important;
+    border-color: var(--app-border-strong) !important;
+}
+
+body.dark-mode .table tbody td {
+    background: var(--app-surface) !important;
+    color: var(--app-text) !important;
+    border-color: var(--app-border) !important;
+}
+
+body.dark-mode .form-control,
+body.dark-mode .form-select {
+    background: var(--app-surface-soft) !important;
+    color: var(--app-text) !important;
+    border-color: var(--app-border-strong) !important;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 992px) {
+    .content-wrapper,
+    body.sidebar-collapsed .content-wrapper {
+        margin-left: 0 !important;
+    }
+
+    .sidebar {
+        transform: translateX(-100%) !important;
+    }
+
+    body.sidebar-mobile-open .sidebar {
+        transform: translateX(0) !important;
+    }
+
+    .content {
+        padding: 1rem !important;
+    }
+
+    .app-footer,
+    footer {
+        flex-direction: column !important;
+        gap: .25rem !important;
+        text-align: center !important;
+    }
+}
