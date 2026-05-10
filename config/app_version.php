@@ -26,6 +26,31 @@ if (!defined('MAIL_FROM_NAME')) {
     define('MAIL_FROM_NAME', 'Einkauf Support');
 }
 
+/*
+ * SMTP-Konfiguration für den E-Mail-Versand.
+ * Tragt hier die Zugangsdaten eures Mailservers ein.
+ * SMTP_SECURE: 'tls' (Port 587, empfohlen), 'ssl' (Port 465), oder '' (Port 25, kein TLS)
+ */
+if (!defined('SMTP_HOST')) {
+    define('SMTP_HOST', 'mail.nnewton.de');    // z.B. mail.nnewton.de oder smtp.gmail.com
+}
+
+if (!defined('SMTP_PORT')) {
+    define('SMTP_PORT', 587);
+}
+
+if (!defined('SMTP_SECURE')) {
+    define('SMTP_SECURE', 'tls');              // 'tls', 'ssl', oder ''
+}
+
+if (!defined('SMTP_USER')) {
+    define('SMTP_USER', 'support@nnewton.de'); // Euer E-Mail-Benutzername
+}
+
+if (!defined('SMTP_PASS')) {
+    define('SMTP_PASS', '');                   // Euer E-Mail-Passwort hier eintragen!
+}
+
 if (!defined('APP_VERSION_NAME')) {
     define('APP_VERSION_NAME', 'Beta');
 }

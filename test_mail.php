@@ -20,6 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test'])) {
             <table style="border-collapse:collapse;font-size:14px;margin-top:12px;">
                 <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Absender:</td><td><strong>' . htmlspecialchars(defined('MAIL_FROM') ? MAIL_FROM : 'support@nnewton.de', ENT_QUOTES, 'UTF-8') . '</strong></td></tr>
                 <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Empfänger:</td><td>' . htmlspecialchars($toEmail, ENT_QUOTES, 'UTF-8') . '</td></tr>
+                <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Methode:</td><td>' . (defined('SMTP_HOST') && SMTP_HOST !== '' ? 'SMTP (' . htmlspecialchars(SMTP_HOST, ENT_QUOTES, 'UTF-8') . ')' : 'PHP mail()') . '</td></tr>
                 <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Zeitpunkt:</td><td>' . date('d.m.Y H:i:s') . '</td></tr>
             </table>
             <p style="margin-top:20px;color:#64748b;font-size:13px;">Wenn du diese E-Mail erhältst, funktioniert der E-Mail-Versand korrekt.</p>
@@ -27,11 +28,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test'])) {
 
         $sent = sendMail($toEmail, 'Test', 'Test-E-Mail vom Einkauf-Portal', $html);
 
+        $method = (defined('SMTP_HOST') && SMTP_HOST !== '') ? 'SMTP (' . SMTP_HOST . ':' . (defined('SMTP_PORT') ? SMTP_PORT : 587) . ')' : 'PHP mail()';
+
         $result = [
             'success' => $sent,
             'message' => $sent
-                ? 'E-Mail wurde erfolgreich an ' . $toEmail . ' übergeben. Bitte Posteingang (und Spam) prüfen.'
-                : 'PHP mail() hat false zurückgegeben. Prüfe ob der Mailserver auf dem Server konfiguriert ist.',
+                ? 'E-Mail wurde erfolgreich über ' . $method . ' an ' . $toEmail . ' übergeben. Bitte Posteingang (und Spam) prüfen.'
+                : 'E-Mail-Versand über ' . $method . ' fehlgeschlagen. Prüfe SMTP_HOST, SMTP_USER und SMTP_PASS in config/app_version.php.',
         ];
     }
 }
@@ -84,6 +87,34 @@ ob_start();
                 <table class="table table-sm mb-0">
                     <tbody>
                         <tr>
+                            <td class="text-muted">Versandmethode</td>
+                            <td>
+                                <?php if (defined('SMTP_HOST') && SMTP_HOST !== ''): ?>
+                                    <span class="badge bg-success">SMTP</span>
+                                <?php else: ?>
+                                    <span class="badge bg-warning text-dark">PHP mail()</span>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                        <?php if (defined('SMTP_HOST') && SMTP_HOST !== ''): ?>
+                        <tr>
+                            <td class="text-muted">SMTP Host</td>
+                            <td><code><?= htmlspecialchars(SMTP_HOST) ?></code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">SMTP Port / TLS</td>
+                            <td><code><?= defined('SMTP_PORT') ? (int)SMTP_PORT : 587 ?> / <?= htmlspecialchars(defined('SMTP_SECURE') ? SMTP_SECURE : 'tls') ?></code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">SMTP Benutzer</td>
+                            <td><code><?= htmlspecialchars(defined('SMTP_USER') ? SMTP_USER : '-') ?></code></td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">SMTP Passwort</td>
+                            <td><code><?= (defined('SMTP_PASS') && SMTP_PASS !== '') ? '●●●●●●●●' : '<span class="text-danger">nicht gesetzt</span>' ?></code></td>
+                        </tr>
+                        <?php endif; ?>
+                        <tr>
                             <td class="text-muted">Absender</td>
                             <td><code><?= htmlspecialchars(defined('MAIL_FROM') ? MAIL_FROM : 'support@nnewton.de') ?></code></td>
                         </tr>
@@ -121,15 +152,18 @@ ob_start();
 
         <div class="card shadow-sm border-0 mt-4">
             <div class="card-header">
-                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Hinweise</h5>
+                <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>SMTP einrichten</h5>
             </div>
             <div class="card-body small text-muted">
-                <p class="mb-2"><strong>Admin-E-Mails ändern:</strong><br>
+                <p class="mb-2">Öffne <code>config/app_version.php</code> und trage dein E-Mail-Passwort ein:</p>
+                <pre class="bg-light rounded p-2 mb-2" style="font-size:.8rem;">define('SMTP_HOST', 'mail.nnewton.de');
+define('SMTP_PORT', 587);
+define('SMTP_SECURE', 'tls');
+define('SMTP_USER', 'support@nnewton.de');
+define('SMTP_PASS', '<strong>DEIN PASSWORT</strong>');</pre>
+                <p class="mb-2">Den SMTP-Host und Port findest du in den Einstellungen deines Hosting-Anbieters (Plesk → E-Mail-Adressen → Einstellungen).</p>
+                <p class="mb-0"><strong>Admin-E-Mails ändern:</strong><br>
                     In <code>config/app_version.php</code> unter <code>SUPPORT_ADMIN_EMAILS</code> beliebig viele Adressen eintragen.</p>
-                <p class="mb-2"><strong>Mail kommt nicht an?</strong><br>
-                    Spam-Ordner prüfen. Falls PHP <code>mail()</code> nicht funktioniert, muss der Hosting-Anbieter einen Mailserver (Sendmail/Postfix) bereitstellen oder SMTP konfiguriert werden.</p>
-                <p class="mb-0"><strong>Support-Ticket erstellen:</strong><br>
-                    Oben rechts auf das <i class="bi bi-gear"></i> Zahnrad klicken → „Support / Feedback" auswählen.</p>
             </div>
         </div>
     </div>
