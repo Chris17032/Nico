@@ -49,6 +49,7 @@ try {
 // Run pending schema migrations silently
 try {
     $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(255) NULL DEFAULT NULL AFTER family_name");
+    $pdo->exec("ALTER TABLE users ADD COLUMN IF NOT EXISTS theme_mode VARCHAR(10) NULL DEFAULT 'auto'");
     $pdo->exec("
         CREATE TABLE IF NOT EXISTS support_tickets (
             id INT AUTO_INCREMENT PRIMARY KEY,

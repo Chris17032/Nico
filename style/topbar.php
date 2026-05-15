@@ -139,14 +139,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['toggle_maintenance'])
     exit;
 }
 
-$stmt = $pdo->prepare("
-    SELECT setting_value
-    FROM app_settings
-    WHERE setting_key = 'maintenance_mode'
-    LIMIT 1
-");
-$stmt->execute();
-$maintenanceMode = $stmt->fetchColumn() === '1';
+try {
+    $stmt = $pdo->prepare("SELECT setting_value FROM app_settings WHERE setting_key = 'maintenance_mode' LIMIT 1");
+    $stmt->execute();
+    $maintenanceMode = $stmt->fetchColumn() === '1';
+} catch (Throwable $e) {
+    $maintenanceMode = false;
+}
 
 $maintenanceMessage = 'Aktuell wird am System gearbeitet. Es kann kurzzeitig zu Einschränkungen kommen.';
 
@@ -154,23 +153,24 @@ $notifications = [];
 $unreadNotifications = 0;
 
 if (isset($_SESSION['user_id'])) {
-    $stmt = $pdo->prepare("
-        SELECT COUNT(*)
-        FROM notifications
-        WHERE user_id = ? AND is_read = 0
-    ");
-    $stmt->execute([(int)$_SESSION['user_id']]);
-    $unreadNotifications = (int)$stmt->fetchColumn();
+    try {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = 0");
+        $stmt->execute([(int)$_SESSION['user_id']]);
+        $unreadNotifications = (int)$stmt->fetchColumn();
 
-    $stmt = $pdo->prepare("
-        SELECT id, type, title, message, link, is_read, created_at
-        FROM notifications
-        WHERE user_id = ?
-        ORDER BY created_at DESC
-        LIMIT 8
-    ");
-    $stmt->execute([(int)$_SESSION['user_id']]);
-    $notifications = $stmt->fetchAll();
+        $stmt = $pdo->prepare("
+            SELECT id, type, title, message, link, is_read, created_at
+            FROM notifications
+            WHERE user_id = ?
+            ORDER BY created_at DESC
+            LIMIT 8
+        ");
+        $stmt->execute([(int)$_SESSION['user_id']]);
+        $notifications = $stmt->fetchAll();
+    } catch (Throwable $e) {
+        $notifications = [];
+        $unreadNotifications = 0;
+    }
 }
 ?>
 
@@ -643,32 +643,34 @@ if (isset($_SESSION['user_id'])) {
         });
     <?php endif; ?>
 
-    /* Support Ticket Modal */
-    document.getElementById('supportTicketForm')?.addEventListener('submit', function (e) {
-        e.preventDefault();
-        const btn = this.querySelector('[type="submit"]');
-        const fd  = new FormData(this);
-        fd.append('ajax_action', 'submit_ticket');
-        btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Senden…';
+    /* Support Ticket Modal – listener set after DOM is ready so the element exists */
+    document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('supportTicketForm')?.addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = this.querySelector('[type="submit"]');
+            const fd  = new FormData(this);
+            fd.append('ajax_action', 'submit_ticket');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>Senden…';
 
-        fetch('support.php', { method: 'POST', body: fd })
-            .then(r => r.json())
-            .then(res => {
-                window.showAppToast(res.message, res.success);
-                if (res.success) {
-                    document.getElementById('supportTicketForm').reset();
-                    bootstrap.Modal.getInstance(document.getElementById('supportTicketModal'))?.hide();
-                } else {
+            fetch('support.php', { method: 'POST', body: fd })
+                .then(r => r.json())
+                .then(res => {
+                    window.showAppToast(res.message, res.success);
+                    if (res.success) {
+                        document.getElementById('supportTicketForm').reset();
+                        bootstrap.Modal.getInstance(document.getElementById('supportTicketModal'))?.hide();
+                    } else {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-send me-1"></i>Absenden';
+                    }
+                })
+                .catch(() => {
+                    window.showAppToast('Fehler beim Senden.', false);
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-send me-1"></i>Absenden';
-                }
-            })
-            .catch(() => {
-                window.showAppToast('Fehler beim Senden.', false);
-                btn.disabled = false;
-                btn.innerHTML = '<i class="bi bi-send me-1"></i>Absenden';
-            });
+                });
+        });
     });
 </script>
 

@@ -7,13 +7,13 @@ if (!isset($_SESSION['user_id'])) {
 $pageTitle = $pageTitle ?? 'Dashboard';
 $content = $content ?? '';
 
-$stmt = $pdo->prepare("
-    SELECT theme_mode
-    FROM users
-    WHERE id = ?
-");
-$stmt->execute([$_SESSION['user_id']]);
-$userSettings = $stmt->fetch();
+try {
+    $stmt = $pdo->prepare("SELECT theme_mode FROM users WHERE id = ?");
+    $stmt->execute([$_SESSION['user_id']]);
+    $userSettings = $stmt->fetch();
+} catch (Throwable $e) {
+    $userSettings = false;
+}
 
 $themeMode = $userSettings['theme_mode'] ?? 'auto';
 
