@@ -183,9 +183,6 @@ ob_start();
                         <button type="submit" class="btn btn-primary flex-fill">
                             <i class="bi bi-check2 me-1"></i>Speichern
                         </button>
-                        <button type="button" class="btn btn-outline-danger btn-delete-ticket" data-id="<?= $detail['id'] ?>">
-                            <i class="bi bi-trash"></i>
-                        </button>
                     </div>
                 </form>
             </div>
@@ -282,20 +279,6 @@ document.getElementById('ticketEditForm')?.addEventListener('submit', function (
         .catch(() => window.showAppToast('Fehler beim Speichern.', false));
 });
 
-document.querySelector('.btn-delete-ticket')?.addEventListener('click', function () {
-    if (!confirm('Ticket wirklich löschen?')) return;
-    const fd = new FormData();
-    fd.append('ajax_action', 'delete_ticket');
-    fd.append('ticket_id', this.dataset.id);
-
-    fetch('support.php', { method: 'POST', body: fd })
-        .then(r => r.json())
-        .then(res => {
-            window.showAppToast(res.message, res.success);
-            if (res.success) setTimeout(() => location.href = 'admin_support.php', 800);
-        })
-        .catch(() => window.showAppToast('Fehler.', false));
-});
 <?php endif; ?>
 </script>
 

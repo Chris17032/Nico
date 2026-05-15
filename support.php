@@ -130,21 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         supportJsonResponse(true, 'Ticket wurde aktualisiert.');
     }
 
-    /* --- Admin: delete ticket --- */
-    if ($action === 'delete_ticket' && $isAdmin) {
-        $ticketId = (int)($_POST['ticket_id'] ?? 0);
-
-        if ($ticketId <= 0) {
-            supportJsonResponse(false, 'Ungültiges Ticket.');
-        }
-
-        $stmt = $pdo->prepare("DELETE FROM support_tickets WHERE id = ?");
-        $stmt->execute([$ticketId]);
-
-        supportJsonResponse(true, 'Ticket wurde gelöscht.');
-    }
-
-    supportJsonResponse(false, 'Unbekannte Aktion.');
+supportJsonResponse(false, 'Unbekannte Aktion.');
 }
 
 http_response_code(404);
