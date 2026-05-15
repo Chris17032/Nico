@@ -107,8 +107,25 @@ function smtpSend(
     $timeout = 15;
 
     try {
+        // SSL context: disable peer verification for shared hosting where the mail
+        // server certificate CN doesn't match the configured hostname (e.g. web03.x != mail.y)
+        $sslContext = stream_context_create([
+            'ssl' => [
+                'verify_peer'       => false,
+                'verify_peer_name'  => false,
+                'allow_self_signed' => true,
+            ],
+        ]);
+
         $prefix = ($secure === 'ssl') ? 'ssl://' : '';
-        $sock   = @fsockopen($prefix . $host, $port, $errno, $errstr, $timeout);
+        $sock   = @stream_socket_client(
+            $prefix . $host . ':' . $port,
+            $errno,
+            $errstr,
+            $timeout,
+            STREAM_CLIENT_CONNECT,
+            $sslContext
+        );
 
         if (!$sock) {
             return false;
