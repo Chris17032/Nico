@@ -49,7 +49,7 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Datenbankfehler – bitte Administrator kontaktieren.");
+    die("Datenbankfehler: " . htmlspecialchars($e->getMessage()) . " [Host: $dbHost, DB: $dbName, User: $dbUser]");
 }
 
 // Run pending schema migrations silently
