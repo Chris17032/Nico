@@ -33,7 +33,7 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
     $toHeader   = '"' . $safeToName . '" <' . $toEmail . '>';
 
     try {
-        return mail($toHeader, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers, '-f' . $fromEmail);
+        return mail($toHeader, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
     } catch (Throwable $e) {
         return false;
     }
