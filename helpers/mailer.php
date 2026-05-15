@@ -61,31 +61,35 @@ function brevoApiSend(
         'htmlContent' => $htmlBody,
     ]);
 
-    $ctx = stream_context_create([
-        'http' => [
-            'method'  => 'POST',
-            'header'  => implode("\r\n", [
+    try {
+        $ch = curl_init('https://api.brevo.com/v3/smtp/email');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $payload,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_HTTPHEADER     => [
                 'Content-Type: application/json',
                 'api-key: ' . BREVO_API_KEY,
-                'Content-Length: ' . strlen($payload),
-            ]),
-            'content' => $payload,
-            'timeout' => 15,
-            'ignore_errors' => true,
-        ],
-    ]);
+            ],
+        ]);
 
-    try {
-        $resp = @file_get_contents('https://api.brevo.com/v3/smtp/email', false, $ctx);
-        if ($resp === false) {
-            error_log('Brevo API: file_get_contents failed');
+        $resp    = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlErr = curl_error($ch);
+        curl_close($ch);
+
+        if ($curlErr !== '') {
+            error_log('Brevo API curl error: ' . $curlErr);
             return false;
         }
+
         $data = json_decode($resp, true);
-        if (isset($data['messageId']) || isset($data['messageIds'])) {
+        if ($httpCode >= 200 && $httpCode < 300) {
             return true;
         }
-        error_log('Brevo API error: ' . $resp);
+
+        error_log('Brevo API HTTP ' . $httpCode . ': ' . $resp);
         return false;
     } catch (Throwable $e) {
         error_log('Brevo API exception: ' . $e->getMessage());
