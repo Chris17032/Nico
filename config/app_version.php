@@ -10,7 +10,7 @@ if (!defined('APP_VERSION')) {
  */
 if (!defined('SUPPORT_ADMIN_EMAILS')) {
     define('SUPPORT_ADMIN_EMAILS', [
-        defined('MAIL_FROM_LOCAL') ? MAIL_FROM_LOCAL : 'admin@example.com',
+        defined('SUPPORT_ADMIN_EMAIL_LOCAL') ? SUPPORT_ADMIN_EMAIL_LOCAL : (defined('MAIL_FROM_LOCAL') ? MAIL_FROM_LOCAL : 'admin@example.com'),
     ]);
 }
 
