@@ -613,6 +613,7 @@ if (isset($_SESSION['user_id'])) {
             e.preventDefault();
             e.stopPropagation();
             formData.append('ajax_action', 'delete_all_notifications');
+            formData.append('confirm_delete_all', '1');
         } else if (item) {
             formData.append('ajax_action', 'mark_read');
             formData.append('notification_id', item.dataset.notificationId);

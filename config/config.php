@@ -64,6 +64,57 @@ try {
             closed_at DATETIME NULL
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS notifications (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            type VARCHAR(50) NOT NULL DEFAULT 'info',
+            title VARCHAR(255) NOT NULL,
+            message TEXT NULL,
+            link VARCHAR(500) NULL,
+            is_read TINYINT(1) NOT NULL DEFAULT 0,
+            read_at DATETIME NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_user_unread (user_id, is_read)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS activity_logs (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NULL,
+            user_name VARCHAR(255) NULL,
+            action TEXT NOT NULL,
+            ip VARCHAR(45) NULL,
+            user_agent VARCHAR(500) NULL,
+            category VARCHAR(50) NULL,
+            severity VARCHAR(20) NULL DEFAULT 'info',
+            target_type VARCHAR(50) NULL,
+            target_id INT NULL,
+            meta JSON NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_user (user_id),
+            INDEX idx_created (created_at)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS app_settings (
+            setting_key VARCHAR(100) PRIMARY KEY,
+            setting_value TEXT NULL,
+            updated_at DATETIME NULL ON UPDATE CURRENT_TIMESTAMP
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
+    $pdo->exec("
+        CREATE TABLE IF NOT EXISTS remember_tokens (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            user_id INT NOT NULL,
+            selector VARCHAR(64) NOT NULL UNIQUE,
+            token_hash VARCHAR(255) NOT NULL,
+            expires_at DATETIME NOT NULL,
+            created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            INDEX idx_selector (selector),
+            INDEX idx_user (user_id)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    ");
 } catch (Throwable $migrationEx) {
     // Schema migrations must not crash the app
 }

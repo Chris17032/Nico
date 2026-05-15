@@ -420,10 +420,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
             $stmt = $pdo->prepare("DELETE FROM invoices WHERE user_id = ?");
             $stmt->execute([$userId]);
 
+            $stmt = $pdo->prepare("DELETE FROM order_items WHERE order_group_id IN (SELECT id FROM order_groups WHERE user_id = ?)");
+            $stmt->execute([$userId]);
+
             $stmt = $pdo->prepare("DELETE FROM order_groups WHERE user_id = ?");
             $stmt->execute([$userId]);
 
-            $stmt = $pdo->prepare("DELETE FROM orders WHERE user_id = ?");
+            $stmt = $pdo->prepare("DELETE FROM notifications WHERE user_id = ?");
+            $stmt->execute([$userId]);
+
+            $stmt = $pdo->prepare("DELETE FROM support_tickets WHERE user_id = ?");
             $stmt->execute([$userId]);
 
             $stmt = $pdo->prepare("DELETE FROM remember_tokens WHERE user_id = ?");
@@ -444,8 +450,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
                     'related_data_deleted' => [
                         'invoice_items' => true,
                         'invoices' => true,
+                        'order_items' => true,
                         'order_groups' => true,
-                        'orders' => true,
+                        'notifications' => true,
+                        'support_tickets' => true,
                         'remember_tokens' => true
                     ]
                 ]
