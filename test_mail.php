@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test'])) {
 
         $sent = sendMail($toEmail, 'Test', 'Test-E-Mail vom Einkauf-Portal', $html);
 
-        $method = (defined('SMTP_HOST') && SMTP_HOST !== '') ? 'SMTP (' . SMTP_HOST . ':' . (defined('SMTP_PORT') ? SMTP_PORT : 587) . ')' : 'PHP mail()';
+        $method = (defined('BREVO_API_KEY') && BREVO_API_KEY !== '') ? 'Brevo API' : ((defined('SMTP_HOST') && SMTP_HOST !== '') ? 'SMTP (' . SMTP_HOST . ':' . (defined('SMTP_PORT') ? SMTP_PORT : 587) . ')' : 'PHP mail()');
 
         $result = [
             'success' => $sent,

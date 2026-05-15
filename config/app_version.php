@@ -29,6 +29,10 @@ if (!defined('MAIL_FROM_NAME')) {
 /*
  * SMTP-Konfiguration – Werte kommen aus config/local.php (nicht auf GitHub).
  */
+if (!defined('BREVO_API_KEY')) {
+    define('BREVO_API_KEY', defined('BREVO_API_KEY_LOCAL') ? BREVO_API_KEY_LOCAL : '');
+}
+
 if (!defined('SMTP_HOST')) {
     define('SMTP_HOST', defined('SMTP_HOST_LOCAL') ? SMTP_HOST_LOCAL : '');
 }

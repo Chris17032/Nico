@@ -16,8 +16,12 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
         return false;
     }
 
-    $fromEmail = defined('MAIL_FROM')      ? MAIL_FROM      : 'support@nnewton.de';
+    $fromEmail = defined('MAIL_FROM')      ? MAIL_FROM      : 'noreply@example.com';
     $fromName  = defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'Einkauf Support';
+
+    if (defined('BREVO_API_KEY') && BREVO_API_KEY !== '') {
+        return brevoApiSend($toEmail, $toName, $fromEmail, $fromName, $subject, $htmlBody);
+    }
 
     [$contentHeaders, $body] = buildMimeParts($htmlBody, $attachment);
 
@@ -35,6 +39,56 @@ function sendMail(string $toEmail, string $toName, string $subject, string $html
     try {
         return mail($toHeader, '=?UTF-8?B?' . base64_encode($subject) . '?=', $body, $headers);
     } catch (Throwable $e) {
+        return false;
+    }
+}
+
+/**
+ * Sends via Brevo HTTP API (port 443 – works even when SMTP ports are blocked).
+ */
+function brevoApiSend(
+    string $toEmail,
+    string $toName,
+    string $fromEmail,
+    string $fromName,
+    string $subject,
+    string $htmlBody
+): bool {
+    $payload = json_encode([
+        'sender'      => ['name' => $fromName, 'email' => $fromEmail],
+        'to'          => [['email' => $toEmail, 'name' => $toName]],
+        'subject'     => $subject,
+        'htmlContent' => $htmlBody,
+    ]);
+
+    $ctx = stream_context_create([
+        'http' => [
+            'method'  => 'POST',
+            'header'  => implode("\r\n", [
+                'Content-Type: application/json',
+                'api-key: ' . BREVO_API_KEY,
+                'Content-Length: ' . strlen($payload),
+            ]),
+            'content' => $payload,
+            'timeout' => 15,
+            'ignore_errors' => true,
+        ],
+    ]);
+
+    try {
+        $resp = @file_get_contents('https://api.brevo.com/v3/smtp/email', false, $ctx);
+        if ($resp === false) {
+            error_log('Brevo API: file_get_contents failed');
+            return false;
+        }
+        $data = json_decode($resp, true);
+        if (isset($data['messageId']) || isset($data['messageIds'])) {
+            return true;
+        }
+        error_log('Brevo API error: ' . $resp);
+        return false;
+    } catch (Throwable $e) {
+        error_log('Brevo API exception: ' . $e->getMessage());
         return false;
     }
 }
