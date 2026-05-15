@@ -1,0 +1,6 @@
+# Lokale Konfiguration mit Credentials – wird NICHT auf GitHub gepusht
+config/local.php
+
+# Logs
+*.log
+php_page_errors.log

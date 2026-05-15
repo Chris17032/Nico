@@ -10,42 +10,43 @@ if (!defined('APP_VERSION')) {
  */
 if (!defined('SUPPORT_ADMIN_EMAILS')) {
     define('SUPPORT_ADMIN_EMAILS', [
-        'testing@bestellungen-ffkleinhoeflein.at',
+        defined('MAIL_FROM_LOCAL') ? MAIL_FROM_LOCAL : 'admin@example.com',
     ]);
 }
 
 /*
  * Absende-Adresse für alle System-E-Mails.
+ * Wird aus config/local.php geladen (nicht auf GitHub).
  */
 if (!defined('MAIL_FROM')) {
-    define('MAIL_FROM', 'testing@bestellungen-ffkleinhoeflein.at');
+    define('MAIL_FROM', defined('MAIL_FROM_LOCAL') ? MAIL_FROM_LOCAL : 'noreply@example.com');
 }
 
 if (!defined('MAIL_FROM_NAME')) {
-    define('MAIL_FROM_NAME', 'Einkauf Support');
+    define('MAIL_FROM_NAME', defined('MAIL_FROM_NAME_LOCAL') ? MAIL_FROM_NAME_LOCAL : 'Einkauf Support');
 }
 
 /*
- * SMTP-Konfiguration für den E-Mail-Versand.
+ * SMTP-Konfiguration – Werte kommen aus config/local.php (nicht auf GitHub).
  */
 if (!defined('SMTP_HOST')) {
-    define('SMTP_HOST', 'mail.bestellungen-ffkleinhoeflein.at');
+    define('SMTP_HOST', defined('SMTP_HOST_LOCAL') ? SMTP_HOST_LOCAL : '');
 }
 
 if (!defined('SMTP_PORT')) {
-    define('SMTP_PORT', 587);
+    define('SMTP_PORT', defined('SMTP_PORT_LOCAL') ? SMTP_PORT_LOCAL : 587);
 }
 
 if (!defined('SMTP_SECURE')) {
-    define('SMTP_SECURE', 'tls');
+    define('SMTP_SECURE', defined('SMTP_SECURE_LOCAL') ? SMTP_SECURE_LOCAL : 'tls');
 }
 
 if (!defined('SMTP_USER')) {
-    define('SMTP_USER', 'testing@bestellungen-ffkleinhoeflein.at');
+    define('SMTP_USER', defined('SMTP_USER_LOCAL') ? SMTP_USER_LOCAL : '');
 }
 
 if (!defined('SMTP_PASS')) {
-    define('SMTP_PASS', '93e8fcS!6');
+    define('SMTP_PASS', defined('SMTP_PASS_LOCAL') ? SMTP_PASS_LOCAL : '');
 }
 
 if (!defined('APP_VERSION_NAME')) {

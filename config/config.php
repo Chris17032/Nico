@@ -5,6 +5,12 @@ ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/app_version.php';
+
+// Lokale Credentials laden (nicht auf GitHub – siehe .gitignore)
+if (file_exists(__DIR__ . '/local.php')) {
+    require_once __DIR__ . '/local.php';
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -26,11 +32,11 @@ function getRoleName($rank)
     return $ROLES[$rank] ?? 'Unbekannt';
 }
 
-$dbHost = 'localhost';
-$dbPort = '3306';
-$dbName = 'nicosdev_einkauf';
-$dbUser = 'nicosdev_einkauf';
-$dbPass = 'qSus5mGc7&Brws*9';
+$dbHost = defined('DB_HOST') ? DB_HOST : 'localhost';
+$dbPort = defined('DB_PORT') ? DB_PORT : '3306';
+$dbName = defined('DB_NAME') ? DB_NAME : 'einkauf';
+$dbUser = defined('DB_USER') ? DB_USER : 'einkauf';
+$dbPass = defined('DB_PASS') ? DB_PASS : '';
 
 try {
     $pdo = new PDO(
