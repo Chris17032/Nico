@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
                         <tr><td style="padding:4px 12px 4px 0;color:#64748b;">Betreff:</td><td>' . htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') . '</td></tr>
                     </table>
                     <p style="margin-top:16px;background:#f4f6f9;padding:12px;border-left:3px solid #2563eb;">' . nl2br(htmlspecialchars($message, ENT_QUOTES, 'UTF-8')) . '</p>
-                    <p><a href="https://einkauf.nnewton.de/admin_support.php?id=' . $ticketId . '">Ticket im System öffnen →</a></p>
+                    <p><a href="https://testing.bestellungen-ffkleinhoeflein.at/admin_support.php?id=' . $ticketId . '">Ticket im System öffnen →</a></p>
                 ';
                 sendMail(trim($adminEmail), 'Admin', 'Neues Support-Ticket: ' . $subject, $htmlEmail);
             }
