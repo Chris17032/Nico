@@ -4,12 +4,13 @@ ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-require_once __DIR__ . '/app_version.php';
-
 // Lokale Credentials laden (nicht auf GitHub – siehe .gitignore)
+// Muss VOR app_version.php geladen werden, damit SMTP_HOST_LOCAL etc. definiert sind
 if (file_exists(__DIR__ . '/local.php')) {
     require_once __DIR__ . '/local.php';
 }
+
+require_once __DIR__ . '/app_version.php';
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -49,7 +50,7 @@ try {
         ]
     );
 } catch (PDOException $e) {
-    die("Datenbankfehler: " . htmlspecialchars($e->getMessage()) . " [Host: $dbHost, DB: $dbName, User: $dbUser]");
+    die("Datenbankfehler – bitte Administrator kontaktieren.");
 }
 
 // Run pending schema migrations silently
