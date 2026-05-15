@@ -116,8 +116,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
             supportJsonResponse(false, 'Ticket nicht gefunden.');
         }
 
-        $closedAt = ($status === 'geschlossen' && $ticket['status'] !== 'geschlossen') ? 'NOW()' : 'closed_at';
-
         $stmt = $pdo->prepare("
             UPDATE support_tickets
             SET status = ?, priority = ?, admin_note = ?,
@@ -130,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['ajax_action'])) {
         supportJsonResponse(true, 'Ticket wurde aktualisiert.');
     }
 
-supportJsonResponse(false, 'Unbekannte Aktion.');
+    supportJsonResponse(false, 'Unbekannte Aktion.');
 }
 
 http_response_code(404);
