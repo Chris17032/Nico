@@ -10,8 +10,7 @@ if (!defined('APP_VERSION')) {
  */
 if (!defined('SUPPORT_ADMIN_EMAILS')) {
     define('SUPPORT_ADMIN_EMAILS', [
-        'support@nnewton.de',
-        // 'weitere@email.de',
+        'testing@bestellungen-ffkleinhoeflein.at',
     ]);
 }
 
@@ -19,7 +18,7 @@ if (!defined('SUPPORT_ADMIN_EMAILS')) {
  * Absende-Adresse für alle System-E-Mails.
  */
 if (!defined('MAIL_FROM')) {
-    define('MAIL_FROM', 'support@nnewton.de');
+    define('MAIL_FROM', 'testing@bestellungen-ffkleinhoeflein.at');
 }
 
 if (!defined('MAIL_FROM_NAME')) {
@@ -28,11 +27,9 @@ if (!defined('MAIL_FROM_NAME')) {
 
 /*
  * SMTP-Konfiguration für den E-Mail-Versand.
- * Tragt hier die Zugangsdaten eures Mailservers ein.
- * SMTP_SECURE: 'tls' (Port 587, empfohlen), 'ssl' (Port 465), oder '' (Port 25, kein TLS)
  */
 if (!defined('SMTP_HOST')) {
-    define('SMTP_HOST', 'mail.nnewton.de');    // z.B. mail.nnewton.de oder smtp.gmail.com
+    define('SMTP_HOST', 'mail.bestellungen-ffkleinhoeflein.at');
 }
 
 if (!defined('SMTP_PORT')) {
@@ -40,15 +37,15 @@ if (!defined('SMTP_PORT')) {
 }
 
 if (!defined('SMTP_SECURE')) {
-    define('SMTP_SECURE', 'tls');              // 'tls', 'ssl', oder ''
+    define('SMTP_SECURE', 'tls');
 }
 
 if (!defined('SMTP_USER')) {
-    define('SMTP_USER', 'support@nnewton.de'); // Euer E-Mail-Benutzername
+    define('SMTP_USER', 'testing@bestellungen-ffkleinhoeflein.at');
 }
 
 if (!defined('SMTP_PASS')) {
-    define('SMTP_PASS', '');                   // Euer E-Mail-Passwort hier eintragen!
+    define('SMTP_PASS', '93e8fcS!6');
 }
 
 if (!defined('APP_VERSION_NAME')) {
