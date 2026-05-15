@@ -77,7 +77,6 @@ function brevoApiSend(
         $resp    = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $curlErr = curl_error($ch);
-        curl_close($ch);
 
         if ($curlErr !== '') {
             error_log('Brevo API curl error: ' . $curlErr);
