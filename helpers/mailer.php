@@ -65,7 +65,7 @@ function brevoApiSend(
         $ch = curl_init('https://api.brevo.com/v3/smtp/email');
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST           => true,
+            CURLOPT_POST           => 1,
             CURLOPT_POSTFIELDS     => $payload,
             CURLOPT_TIMEOUT        => 15,
             CURLOPT_HTTPHEADER     => [
