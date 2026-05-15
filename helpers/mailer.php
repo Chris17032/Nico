@@ -107,8 +107,6 @@ function smtpSend(
     $timeout = 15;
 
     try {
-        // SSL context: disable peer verification for shared hosting where the mail
-        // server certificate CN doesn't match the configured hostname (e.g. web03.x != mail.y)
         $sslContext = stream_context_create([
             'ssl' => [
                 'verify_peer'       => false,
@@ -128,6 +126,7 @@ function smtpSend(
         );
 
         if (!$sock) {
+            error_log("SMTP connect failed: $errno $errstr (host=$host port=$port)");
             return false;
         }
 
@@ -170,6 +169,7 @@ function smtpSend(
             $write(base64_encode($pass));
             $authResp = $read();
             if (strpos($authResp, '235') === false) {
+                error_log("SMTP auth failed: $authResp (user=$user)");
                 fclose($sock);
                 return false;
             }
@@ -181,6 +181,7 @@ function smtpSend(
         $write('RCPT TO:<' . $toEmail . '>');
         $rcptResp = $read();
         if (strpos($rcptResp, '250') === false && strpos($rcptResp, '251') === false) {
+            error_log("SMTP RCPT failed: $rcptResp");
             fclose($sock);
             return false;
         }
@@ -209,6 +210,7 @@ function smtpSend(
 
         return strpos($dataResp, '250') !== false;
     } catch (Throwable $e) {
+        error_log("SMTP exception: " . $e->getMessage());
         return false;
     }
 }
